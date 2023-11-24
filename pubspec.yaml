@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +28,6 @@ flutter:
     - family: Roboto
       fonts:
         - asset: asset/fonts/Roboto/Roboto-Regular.ttf
+    - family: NotoSansSC
+      fonts:
+        - asset: asset/fonts/NotoSansSC/NotoSansSC-6.ttf
