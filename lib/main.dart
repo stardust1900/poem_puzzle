@@ -93,7 +93,7 @@ class _PoemHomePageState extends State<PoemHomePage> {
                 child: SingleChildScrollView(
                     controller: ctrler,
                     scrollDirection: Axis.vertical,
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Wrap(
                           children: wgts
@@ -146,14 +146,14 @@ class _PoemHomePageState extends State<PoemHomePage> {
         targetWidgets.add(DragTarget<String>(
           builder: (context, candidateData, rejectedData) {
             return Container(
-              width: 60,
-              height: 60,
+              width: 25,
+              height: 25,
               color: const Color.fromARGB(255, 243, 239, 239),
               alignment: Alignment.center,
               child: Visibility(
                   visible: rowVisibables[rowIndex][i],
                   child: Text(characters[i],
-                      style: const TextStyle(fontSize: 35))),
+                      style: const TextStyle(fontSize: 18))),
             );
           },
           // 当拖拽进入时，判断是否接受
@@ -171,7 +171,7 @@ class _PoemHomePageState extends State<PoemHomePage> {
         ));
       } else {
         targetWidgets
-            .add(Text(characters[i], style: const TextStyle(fontSize: 35)));
+            .add(Text(characters[i], style: const TextStyle(fontSize: 10)));
       }
     }
 
@@ -185,10 +185,10 @@ class _PoemHomePageState extends State<PoemHomePage> {
             child: SingleChildScrollView(
                 controller: ctrler,
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Wrap(
                     alignment: WrapAlignment.center,
-                    spacing: 10,
+                    spacing: 3,
                     // children: [child, child, child, child, child],
                     children: targetWidgets))));
     return child;
@@ -196,7 +196,7 @@ class _PoemHomePageState extends State<PoemHomePage> {
 
   Widget titleRow(String text) {
     // print(text.length);
-    double w = 70.0 * text.length;
+    double w = 20.0 * text.length;
     final ctrler = ScrollController(initialScrollOffset: 0);
     return Scrollbar(
         scrollbarOrientation: ScrollbarOrientation.bottom,
@@ -209,17 +209,17 @@ class _PoemHomePageState extends State<PoemHomePage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
                     width: w,
-                    height: 80,
+                    height: 18,
                     color: Color.fromARGB(255, 238, 240, 114),
                     alignment: Alignment.center,
                     child: Wrap(
-                        spacing: 10,
+                        spacing: 2,
                         //动态创建一个List<Widget>
                         children: text
                             .split("")
                             .map((e) => Text(
                                   e,
-                                  style: const TextStyle(fontSize: 35),
+                                  style: const TextStyle(fontSize: 15),
                                 ))
                             .toList())))));
   }
@@ -229,18 +229,18 @@ class _PoemHomePageState extends State<PoemHomePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            width: 100,
-            height: 80,
+            width: 60,
+            height: 18,
             color: Color.fromARGB(255, 238, 240, 114),
             alignment: Alignment.center,
             child: Wrap(
-                spacing: 10,
+                spacing: 2,
                 //动态创建一个List<Widget>
                 children: text
                     .split("")
                     .map((e) => Text(
                           e,
-                          style: const TextStyle(fontSize: 20),
+                          style: const TextStyle(fontSize: 10),
                         ))
                     .toList())),
         Tooltip(
@@ -265,17 +265,54 @@ class _PoemHomePageState extends State<PoemHomePage> {
   Widget tagsRow(List<String> tags) {
     return Center(
         child: Wrap(
-      spacing: 5,
+      spacing: 2,
       children: tags
-          .map((t) => RawChip(
-                label: Text(t),
-              ))
+          .map((t) => Chip(
+              // labelPadding: const EdgeInsets.all(-1.0),
+              // labelPadding:
+              //     const EdgeInsets.only(left: 1, right: 1, top: 0, bottom: 0),
+              // padding: const EdgeInsets.only(left: 1, right: 1, top: -10),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              label: Text(t),
+              labelStyle: const TextStyle(fontSize: 10)))
           .toList(),
     ));
   }
 
   Widget _pickArea() {
     final ctrler = ScrollController(initialScrollOffset: 0);
+    List<Widget> wrap1children = [];
+    List<Widget> wrap2children = [];
+    for (int i = 0; i < pickCharacters.length; i++) {
+      var c = pickCharacters[i];
+      var drag = Draggable<String>(
+        data: c,
+        feedback: Container(
+          // 拖拽时的显示
+          width: 30,
+          height: 30,
+          color: const Color.fromARGB(255, 243, 239, 239).withOpacity(0.5),
+          alignment: Alignment.center,
+          child: Text(c, style: const TextStyle(fontSize: 20)),
+        ), // 携带的数据
+        child: Container(
+          // 正常状态下的显示
+          width: 25,
+          height: 25,
+          color: const Color.fromARGB(255, 243, 239, 239),
+          alignment: Alignment.center,
+          child: Text(
+            c,
+            style: const TextStyle(fontSize: 18),
+          ),
+        ),
+      );
+      if (i < pickCharacters.length / 2) {
+        wrap1children.add(drag);
+      } else {
+        wrap2children.add(drag);
+      }
+    }
     return Expanded(
         flex: 1,
         child: Scrollbar(
@@ -285,38 +322,22 @@ class _PoemHomePageState extends State<PoemHomePage> {
           child: SingleChildScrollView(
             controller: ctrler,
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: Wrap(
-                spacing: 10,
-                //动态创建一个List<Widget>
-                children: pickCharacters
-                    //每一个字母都用一个Text显示,字体为原来的两倍
-                    .map((c) => Draggable<String>(
-                          data: c,
-                          feedback: Container(
-                            // 拖拽时的显示
-                            width: 80,
-                            height: 80,
-                            color: const Color.fromARGB(255, 243, 239, 239)
-                                .withOpacity(0.5),
-                            alignment: Alignment.center,
-                            child: Text(c),
-                          ), // 携带的数据
-                          child: Container(
-                            // 正常状态下的显示
-                            width: 80,
-                            height: 80,
-                            color: const Color.fromARGB(255, 243, 239, 239),
-                            alignment: Alignment.center,
-                            child: Text(
-                              c,
-                              style: const TextStyle(fontSize: 35),
-                            ),
-                          ),
-                        ))
-                    .toList(),
-              ),
+            // padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Wrap(
+                  spacing: 3,
+                  // runSpacing: 10,
+                  //动态创建一个List<Widget>
+                  children: wrap1children,
+                ),
+                Wrap(
+                  spacing: 3,
+                  // runSpacing: 10,
+                  //动态创建一个List<Widget>
+                  children: wrap2children,
+                )
+              ],
             ),
           ),
         ));
