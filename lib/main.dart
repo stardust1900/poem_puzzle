@@ -242,7 +242,22 @@ class _PoemHomePageState extends State<PoemHomePage> {
                           e,
                           style: const TextStyle(fontSize: 20),
                         ))
-                    .toList()))
+                    .toList())),
+        Tooltip(
+            message: '看答案',
+            child: TextButton(
+              onPressed: () => {
+                setState(() {
+                  for (int i = 0; i < rowVisibables.length; i++) {
+                    for (int j = 0; j < rowVisibables[i].length; j++) {
+                      rowVisibables[i][j] = true;
+                    }
+                  }
+                  pickCharacters.clear();
+                })
+              },
+              child: const Icon(Icons.lightbulb_circle),
+            ))
       ],
     );
   }
