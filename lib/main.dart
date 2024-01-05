@@ -63,7 +63,7 @@ class _PoemHomePageState extends State<PoemHomePage> {
   }
 
   @override
-  Widget build(Object context) {
+  Widget build(BuildContext context) {
     if (choosePoem != null) {
       List<Widget> wgts = [];
       var title = choosePoem['title'];
@@ -76,14 +76,30 @@ class _PoemHomePageState extends State<PoemHomePage> {
       if (tags.isNotEmpty) {
         wgts.add(tagsRow(tags));
       }
+      List<String> rows = [];
+      for (int idx = 0; idx < choosePoem['paragraphs'].length; idx++) {
+        var line = choosePoem['paragraphs'][idx];
+        final sb = StringBuffer();
+        for (var s in line.split("")) {
+          sb.write(s);
+          if (!checkPunctuate(s)) {
+            rows.add(sb.toString());
+            sb.clear();
+          }
+        }
+        // wgts.add(wRow(rowIndex, choosePoem['paragraphs'][rowIndex]));
+      }
 
-      for (int rowIndex = 0;
-          rowIndex < choosePoem['paragraphs'].length;
-          rowIndex++) {
-        wgts.add(wRow(rowIndex, choosePoem['paragraphs'][rowIndex]));
+      for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        wgts.add(wRow(rowIndex, rows[rowIndex], context));
       }
       final ctrler = ScrollController(initialScrollOffset: 0);
       return Scaffold(
+        appBar: AppBar(
+          title: const Text("拼拼古诗"),
+          centerTitle: true,
+          backgroundColor: const Color.fromARGB(255, 238, 234, 14),
+        ),
         body: Column(children: <Widget>[
           Expanded(
             flex: 3,
@@ -132,13 +148,16 @@ class _PoemHomePageState extends State<PoemHomePage> {
     }
   }
 
-  Widget wRow(int rowIndex, String text) {
+  Widget wRow(int rowIndex, String text, BuildContext context) {
     List<String> characters = text.split("");
     var targetVisibables = [];
     for (var c in characters) {
       targetVisibables.add(!checkPunctuate(c));
     }
-    rowVisibables.add(targetVisibables);
+    if (rowVisibables.length < rowIndex + 1) {
+      rowVisibables.add(targetVisibables);
+    }
+
     List<Widget> targetWidgets = [];
     var len = characters.length;
     for (int i = 0; i < len; i++) {
@@ -146,14 +165,14 @@ class _PoemHomePageState extends State<PoemHomePage> {
         targetWidgets.add(DragTarget<String>(
           builder: (context, candidateData, rejectedData) {
             return Container(
-              width: 25,
-              height: 25,
+              width: 40,
+              height: 40,
               color: const Color.fromARGB(255, 243, 239, 239),
               alignment: Alignment.center,
               child: Visibility(
                   visible: rowVisibables[rowIndex][i],
                   child: Text(characters[i],
-                      style: const TextStyle(fontSize: 18))),
+                      style: const TextStyle(fontSize: 30))),
             );
           },
           // 当拖拽进入时，判断是否接受
@@ -166,12 +185,28 @@ class _PoemHomePageState extends State<PoemHomePage> {
               // print('rowIndex:$rowIndex i:$i');
               rowVisibables[rowIndex][i] = true;
               pickCharacters.remove(c);
+              // print(rowVisibables);
+              for (int r = 0; r < rowVisibables.length; r++) {
+                for (int s = 0; s < rowVisibables[r].length; s++) {
+                  if (!rowVisibables[r][s]) {
+                    return;
+                  }
+                }
+              }
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const AlertDialog(
+                      title: Text("恭喜你"),
+                      content: Text("拼接古诗成功！"),
+                    );
+                  });
             });
           },
         ));
       } else {
         targetWidgets
-            .add(Text(characters[i], style: const TextStyle(fontSize: 10)));
+            .add(Text(characters[i], style: const TextStyle(fontSize: 30)));
       }
     }
 
@@ -209,7 +244,7 @@ class _PoemHomePageState extends State<PoemHomePage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
                     width: w,
-                    height: 18,
+                    height: 25,
                     color: Color.fromARGB(255, 238, 240, 114),
                     alignment: Alignment.center,
                     child: Wrap(
@@ -289,21 +324,21 @@ class _PoemHomePageState extends State<PoemHomePage> {
         data: c,
         feedback: Container(
           // 拖拽时的显示
-          width: 30,
-          height: 30,
+          width: 55,
+          height: 55,
           color: const Color.fromARGB(255, 243, 239, 239).withOpacity(0.5),
           alignment: Alignment.center,
-          child: Text(c, style: const TextStyle(fontSize: 20)),
+          child: Text(c, style: const TextStyle(fontSize: 45)),
         ), // 携带的数据
         child: Container(
           // 正常状态下的显示
-          width: 25,
-          height: 25,
+          width: 45,
+          height: 45,
           color: const Color.fromARGB(255, 243, 239, 239),
           alignment: Alignment.center,
           child: Text(
             c,
-            style: const TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: 35),
           ),
         ),
       );
@@ -322,21 +357,26 @@ class _PoemHomePageState extends State<PoemHomePage> {
           child: SingleChildScrollView(
             controller: ctrler,
             scrollDirection: Axis.horizontal,
-            // padding: const EdgeInsets.all(8.0),
+            // padding: const EdgeInsets.all(50.0),
             child: Column(
               children: [
-                Wrap(
-                  spacing: 3,
-                  // runSpacing: 10,
-                  //动态创建一个List<Widget>
-                  children: wrap1children,
+                Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: Wrap(
+                    spacing: 3,
+                    // runSpacing: 10,
+                    //动态创建一个List<Widget>
+                    children: wrap1children,
+                  ),
                 ),
-                Wrap(
-                  spacing: 3,
-                  // runSpacing: 10,
-                  //动态创建一个List<Widget>
-                  children: wrap2children,
-                )
+                Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Wrap(
+                      spacing: 3,
+                      // runSpacing: 10,
+                      //动态创建一个List<Widget>
+                      children: wrap2children,
+                    ))
               ],
             ),
           ),
