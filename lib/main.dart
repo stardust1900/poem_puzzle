@@ -70,6 +70,13 @@ class _PoemHomePageState extends State<PoemHomePage> {
       wgts.add(titleRow(title));
       var author = choosePoem['author'];
       wgts.add(authorRow(author));
+
+      List<String> tags =
+          choosePoem['tags'].map<String>((item) => item.toString()).toList();
+      if (tags.isNotEmpty) {
+        wgts.add(tagsRow(tags));
+      }
+
       for (int rowIndex = 0;
           rowIndex < choosePoem['paragraphs'].length;
           rowIndex++) {
@@ -238,6 +245,18 @@ class _PoemHomePageState extends State<PoemHomePage> {
                     .toList()))
       ],
     );
+  }
+
+  Widget tagsRow(List<String> tags) {
+    return Center(
+        child: Wrap(
+      spacing: 5,
+      children: tags
+          .map((t) => RawChip(
+                label: Text(t),
+              ))
+          .toList(),
+    ));
   }
 
   Widget _pickArea() {
